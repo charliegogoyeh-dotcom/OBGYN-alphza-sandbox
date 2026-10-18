@@ -25,6 +25,7 @@ apps-script/
   Index.html        หน้าเว็บทั้งหมด (HTML + CSS + JS ไฟล์เดียว)
   appsscript.json   manifest (V8, Asia/Bangkok, web app = User accessing)
 index.html          Sandbox สำหรับ GitHub Pages — จำลอง Code.gs ในเบราว์เซอร์
+docs/index.html     สำเนาเดียวกัน (ใช้ได้ทั้ง Pages แบบ / (root) และ /docs)
 ```
 
 ## ติดตั้ง (ประมาณ 5 นาที)
@@ -54,7 +55,7 @@ clasp push
 
 ## เปิด Sandbox บน GitHub Pages
 
-Settings → Pages → Source: **Deploy from a branch** → Branch `main` / folder **`/ (root)`** → Save
+Settings → Pages → Source: **Deploy from a branch** → Branch `main` / folder **`/ (root)`** หรือ **`/docs`** ก็ได้ → Save
 
 ## แก้ปัญหา
 
