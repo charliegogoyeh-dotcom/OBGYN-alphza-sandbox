@@ -24,8 +24,7 @@ apps-script/
   Code.gs           ฝั่งเซิร์ฟเวอร์ (อ่าน/เขียนชีท, คำนวณคะแนน, Drive)
   Index.html        หน้าเว็บทั้งหมด (HTML + CSS + JS ไฟล์เดียว)
   appsscript.json   manifest (V8, Asia/Bangkok, web app = User accessing)
-docs/
-  index.html        Sandbox สำหรับ GitHub Pages — จำลอง Code.gs ในเบราว์เซอร์
+index.html          Sandbox สำหรับ GitHub Pages — จำลอง Code.gs ในเบราว์เซอร์
 ```
 
 ## ติดตั้ง (ประมาณ 5 นาที)
@@ -55,7 +54,7 @@ clasp push
 
 ## เปิด Sandbox บน GitHub Pages
 
-Settings → Pages → Source: **Deploy from a branch** → Branch `main` / folder **`/docs`** → Save
+Settings → Pages → Source: **Deploy from a branch** → Branch `main` / folder **`/ (root)`** → Save
 
 ## แก้ปัญหา
 
