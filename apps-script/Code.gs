@@ -62,6 +62,7 @@ function onOpen() {
     .addItem('เปิดแผงด้านข้าง', 'showSidebar')
     .addItem('เปิดหน้าต่างใหญ่', 'showDialog')
     .addItem('🚀 Deploy เว็บ / ใส่ลิงก์', 'openDeployHelper')
+    .addItem('🔧 สร้างปุ่ม 🚀 ใหม่ (ถ้าปุ่มหาย / กดไม่ได้)', 'rebuildDeployButton')
     .addSeparator()
     .addItem('ตั้งค่าเริ่มต้น (สร้างแท็บที่ต้องใช้)', 'setupCaseboard')
     .addItem('สร้างสำเนา Template (ล้างข้อมูลคนไข้)', 'makeTemplateCopy')
@@ -556,17 +557,53 @@ function homeSheet_() {
     var r = sh.getRange(6 + i, 1).setValue(s[0]);
     if (s[1]) r.setFontWeight('bold').setFontColor('#7b2d55');
   });
+  insertDeployButton_(sh);
+  var cfg = readConfig_();
+  setHomeLink_(sh, cfg.web_url && cfg.web_sheet_id === ss.getId() ? cfg.web_url : '');
+  return sh;
+}
+
+function insertDeployButton_(sh) {
   try {
     var img = sh.insertImage(Utilities.newBlob(Utilities.base64Decode(DEPLOY_BTN_PNG), 'image/png', 'deploy-button.png'), 1, 4, 6, 6);
     img.setWidth(324).setHeight(73);
     img.assignScript('openDeployHelper');
     try { img.setAltTextTitle('Deploy เว็บ / ใส่ลิงก์'); } catch (e) {}
+    return true;
   } catch (e) {
     sh.getRange('A4').setValue('🚀 เมนู Caseboard → Deploy เว็บ / ใส่ลิงก์').setFontWeight('bold');
+    return false;
   }
-  var cfg = readConfig_();
-  setHomeLink_(sh, cfg.web_url && cfg.web_sheet_id === ss.getId() ? cfg.web_url : '');
-  return sh;
+}
+
+// เมนู "🔧 สร้างปุ่ม 🚀 ใหม่" — ใช้เมื่อปุ่มถูกลบ / ย้าย / หลุดสคริปต์ (ลบปุ่มเก่าในแท็บ Caseboard แล้ววางใหม่)
+function rebuildDeployButton() {
+  var ss = SpreadsheetApp.getActive();
+  if (!ss.getSheetByName(SH.HOME)) {          // แท็บหายทั้งแท็บ → สร้างใหม่พร้อมปุ่มในตัว
+    ensureAll_();
+    try { ss.setActiveSheet(ss.getSheetByName(SH.HOME)); ss.toast('สร้างแท็บ Caseboard + ปุ่ม 🚀 ใหม่แล้ว', 'Caseboard', 6); } catch (e) {}
+    return { ok: true, removed: 0, recreated: true };
+  }
+  var sh = homeSheet_();
+  var removed = 0;
+  try {
+    sh.getImages().forEach(function (img) {
+      var t = '', a = '';
+      try { t = img.getAltTextTitle() || ''; } catch (e) {}
+      try { a = img.getScript() || ''; } catch (e) {}
+      var cell = img.getAnchorCell();
+      var nearButton = cell.getColumn() <= 2 && cell.getRow() >= 2 && cell.getRow() <= 5;
+      if (/Deploy/.test(t) || a === 'openDeployHelper' || nearButton) { img.remove(); removed++; }
+    });
+  } catch (e) {}
+  if (sh.getRange('A4').getValue()) sh.getRange('A4').clearContent();
+  sh.setRowHeight(4, 86);
+  var ok = insertDeployButton_(sh);
+  try { ss.setActiveSheet(sh); } catch (e) {}
+  try {
+    ss.toast(ok ? 'วางปุ่ม 🚀 ใหม่แล้ว' + (removed ? ' (ลบปุ่มเก่า ' + removed + ' ปุ่ม)' : '') + ' — กดได้เลย' : 'วางปุ่มไม่ได้ ใช้เมนู 🩺 Caseboard → 🚀 แทน', 'Caseboard', 6);
+  } catch (e) {}
+  return { ok: ok, removed: removed };
 }
 
 // เขียนเฉพาะเซลล์ C1:E1 (ไม่แตะ Config)
